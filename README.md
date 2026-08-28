@@ -22,3 +22,4 @@ To scrape the minimal requirements, run:
 ```
 python adc-checker/scrape_specs.py
 ```
+The requirements will be saved at `adc-checker/minimal_attrs.json`
