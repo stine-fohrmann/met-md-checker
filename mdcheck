@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import argparse
-from adccheck import main
+from mdcheck import main
 import sys
 
 if __name__ == '__main__':

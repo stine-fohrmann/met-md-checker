@@ -1,4 +1,4 @@
-# ADC Metadata Compliance Checker
+# MET Metadata Compliance Checker
 
 Tool for checking global attributes of a netCDF file against METNO requirements.
 
@@ -14,12 +14,12 @@ See [https://adc.met.no/submit-data-as-netcdf-cf](https://adc.met.no/submit-data
 
 To check whether a netCDF file complies with the MET requirements, run:
 ```
-adc-checker/adccheck [path-to-file] 
+met-md-checker/mdcheck path/to/file.nc 
 ```
 
 To scrape the minimal requirements, run: 
 
 ```
-python adc-checker/scrape_specs.py
+python met-md-checker/scrape_specs.py
 ```
-The requirements will be saved at `adc-checker/minimal_attrs.json`
+The requirements will be saved at `met-md-checker/minimal_attrs.json`
