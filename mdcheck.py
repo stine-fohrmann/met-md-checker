@@ -1,9 +1,9 @@
 import json
 import xarray as xr
 
-MINREQSPATH = 'adc-checker/minimal_attrs.json'
+MINREQSPATH = 'met-md-checker/minimal_attrs.json'
 
-class ADCChecker():
+class MDChecker():
     def __init__(self, input_file, minimal_attrs=None, global_attrs=None):
         self.input_file = input_file        # netCDF file to check
         self.minimal_attrs = minimal_attrs  # list of minimal required global attributes
@@ -30,7 +30,7 @@ class ADCChecker():
 
         # Centered title and link to specifications
         print("-" * width)
-        print("\n" + 'ADC Metadata Compliance Report'.center(width))
+        print("\n" + 'MET Metadata Compliance Report'.center(width))
         print('https://adc.met.no/submit-data-as-netcdf-cf'.center(width))
         print('\n' + "-" * width)
 
@@ -72,5 +72,5 @@ def main(args):
     with open(MINREQSPATH, 'r') as file:
         minimal_attrs = json.load(file)
 
-    checker = ADCChecker(input_file=args.input_file, minimal_attrs=minimal_attrs)
+    checker = MDChecker(input_file=args.input_file, minimal_attrs=minimal_attrs)
     checker.checkMinimalReqs()
