@@ -26,6 +26,7 @@ class ADCChecker():
     
     def printReport(self, missing_attrs):
         width = 60
+        indent = '     '
 
         # Centered title and link to specifications
         print("-" * width)
@@ -34,19 +35,19 @@ class ADCChecker():
         print('\n' + "-" * width)
 
         # Print file name 
-        print("     " + f'File:   {self.input_file}')
+        print(indent + f'File:   {self.input_file}')
 
         # Print results
         if len(missing_attrs) <= 0:
-            print('     All tests passed. All required attributes are defined.')
+            print(indent + 'All tests passed. All required attributes are defined.')
             print("-" * width)
         else:
-            print("     " + f'Errors: {len(missing_attrs)}')
+            print(indent + f'Errors: {len(missing_attrs)}')
             print('\n' + "-" * width)
 
             count = 1
             for attr in missing_attrs:
-                print(f'    {count:2.0f}) Missing attribute: {attr['name']}')
+                print(indent + f'{count:2.0f}) Missing attribute: {attr['name']}')
                 count += 1
             print("-" * width)
             
