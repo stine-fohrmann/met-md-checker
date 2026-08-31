@@ -2,6 +2,22 @@
 import argparse
 from mdcheck import main
 import sys
+from pathlib import Path
+
+class UnsupportedFormatError(ValueError):
+    """File extension not in allowed list."""
+    pass
+
+def validate_file(filepath: str):
+
+    filepath = Path(filepath)
+    
+    # Check extension
+    if not filepath.suffix.lower() == '.nc':
+        raise UnsupportedFormatError(
+            f"Input file must be a netCDF file.\n{filepath.name} has extension '{filepath.suffix}' (expected: .nc)"
+        )
+
 
 if __name__ == '__main__':
 
@@ -15,6 +31,10 @@ if __name__ == '__main__':
     
     try:
         args = parser.parse_args()
+        validate_file(args.input_file)
+    except UnsupportedFormatError as e:
+        print(f'Error: {e}')
+        sys.exit()
     except:
         parser.print_help()
         sys.exit()
