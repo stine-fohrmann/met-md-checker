@@ -52,6 +52,10 @@ class MDChecker():
             print("-" * width)
             
     def checkMinimalReqs(self):
+        '''
+        Checks whether minimal required attributes are given 
+        (doesn't verify formatting)
+        '''
         self.getMinimalRequirements()
         self.getGlobalAttrs()
 
