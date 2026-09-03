@@ -53,17 +53,21 @@ class MDChecker():
         self.getMinimalRequirements()
         self.getGlobalAttrs()
 
+        # verify geospatial attributes are given and formatted correctly
+        self.checkGeospatial()
+
         # verify time attributes are given and formatted correctly
         self.checkTimeAttrs()
 
         # remove time attributes from list to be checked
-        # TODO get time attrs from json instead
+        # TODO get time attrs from json instead (?)
+        required_geo_attrs = ['geospatial_lat_min', 'geospatial_lat_max', 'geospatial_lon_min', 'geospatial_lon_max']
         required_time_attrs = ['time_coverage_start', 'time_coverage_end', 'date_created']
 
         # verify other attributes are given
         for attr in self.minimal_attrs:
             # skip time attrs
-            if attr['name'] in required_time_attrs:
+            if attr['name'] in required_geo_attrs+required_time_attrs:
                 continue
 
             # check whether required attributes exist  
@@ -106,6 +110,36 @@ class MDChecker():
 
             if isinstance(result, Error):
                 self.errors.append(result)
+    
+    def checkGeospatial(self):
+        '''Checks whether the geospatial bounds are given and are valid values'''
+
+        required_geo_attrs = ['geospatial_lat_min', 'geospatial_lat_max', 'geospatial_lon_min', 'geospatial_lon_max']
+
+        for attr_str in required_geo_attrs:
+            result = None
+            try:    # check if attribute given
+                geo_str = self.given_attrs[attr_str]
+
+                # verify at least 2 decimal points
+                num_decimals = geo_str[::-1].find('.')
+                if num_decimals < 2:
+                    result = Error(attr=attr_str, message='has too few decimal places. Include at least 2 decimal places.')
+                
+                # verify latitude between -90 and 90
+                if (attr_str == 'geospatial_lat_min' or attr_str == 'geospatial_lat_max') and not (-90 < float(geo_str) < 90):
+                    print(float(geo_str))
+                    result = Error(attr=attr_str, message='is invalid. Must be between -90 and 90.')
+                
+                # verify longitude between -180 and 180
+                if (attr_str == 'geospatial_lon_min' or attr_str == 'geospatial_lon_max') and not (-180 < float(geo_str) < 180):
+                    result = Error(attr=attr_str, message='is invalid. Must be between -180 and 180.')
+                
+            except: # return error if attribute not defined
+                result = Error(attr=attr_str, message='is not defined')   
+
+            if isinstance(result, Error):
+                self.errors.append(result)        
     
     def printErrors(self):
         print(INDENT + f'Errors: {len(self.errors)}')
