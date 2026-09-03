@@ -8,6 +8,8 @@ class MDChecker():
         self.input_file = input_file        # netCDF file to check
         self.minimal_attrs = minimal_attrs  # list of minimal required global attributes
         self.global_attrs = global_attrs
+        self.missing_attrs = []
+        self.errors = []
     
     def getMinimalRequirements(self):
         # Get minimal required attrs
@@ -59,16 +61,56 @@ class MDChecker():
         self.getMinimalRequirements()
         self.getGlobalAttrs()
 
-        missing_attrs = []
-
         for attr in self.minimal_attrs:
 
             # check whether required attributes exist  
             if not attr['name'] in self.global_attrs:
-                missing_attrs.append(attr)
+                self.missing_attrs.append(attr)
         
         # Print results in terminal
-        self.printReport(missing_attrs)
+        self.printReport(self.missing_attrs)
+    
+    def checkTimeFormat(self, attr_str):
+        from utils import iso_to_dt64
+
+        try:    # check if attribute defined
+            time_str = self.global_attrs[attr_str]
+            try:    # check if valid ISO format
+                iso_to_dt64(time_str)
+            except: # return error if invalid date or format
+                return Error(attr=attr_str, message='is invalid date or date format')
+        except: # return error if attribute not defined
+            return Error(attr=attr_str, message='is not defined')
+    
+    def checkTimeAttrs(self):
+        # time_coverage_start
+        # time_coverage_end
+        # date_created
+
+        required_time_attrs = ['time_coverage_start', 'time_coverage_end', 'date_created']
+
+        for attr_str in required_time_attrs:
+            result = self.checkTimeFormat(attr_str)
+            if isinstance(result, Error):
+                self.errors.append(result)
+    
+    def printErrors(self):
+        width = 60
+        indent = '     '
+
+        print(indent + f'Errors: {len(self.errors)}')
+        print("-" * width)
+        for e in self.errors:
+            e.printFull(indent)
+
+
+class Error():
+    def __init__(self, attr, message=None):
+        self.message = message
+        self.attr = attr
+    
+    def printFull(self, indent=''):
+        print(indent + f'Error: {self.attr} {self.message}')
 
 
 def main(args):
