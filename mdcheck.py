@@ -2,6 +2,8 @@ import json
 import xarray as xr
 
 MINREQSPATH = 'met-md-checker/minimal_attrs.json'
+INDENT = '     '
+REPORT_WIDTH = 60
 
 class MDChecker():
     def __init__(self, input_file, minimal_attrs=None, global_attrs=None):
@@ -27,31 +29,28 @@ class MDChecker():
         self.global_attrs = ds.attrs
     
     def printReport(self, missing_attrs):
-        width = 60
-        indent = '     '
-
         # Centered title and link to specifications
-        print("-" * width)
-        print("\n" + 'MET Metadata Compliance Report'.center(width))
-        print('https://adc.met.no/submit-data-as-netcdf-cf'.center(width))
-        print('\n' + "-" * width)
+        print("-" * REPORT_WIDTH)
+        print("\n" + 'MET Metadata Compliance Report'.center(REPORT_WIDTH))
+        print('https://adc.met.no/submit-data-as-netcdf-cf'.center(REPORT_WIDTH))
+        print('\n' + "-" * REPORT_WIDTH)
 
         # Print file name 
-        print(indent + f'File:   {self.input_file}')
+        print(INDENT + f'File:   {self.input_file}')
 
         # Print results
         if len(missing_attrs) <= 0:
-            print(indent + 'All tests passed. All required attributes are defined.')
-            print("-" * width)
+            print(INDENT + 'All tests passed. All required attributes are defined.')
+            print("-" * REPORT_WIDTH)
         else:
-            print(indent + f'Errors: {len(missing_attrs)}')
-            print('\n' + "-" * width)
+            print(INDENT + f'Errors: {len(missing_attrs)}')
+            print('\n' + "-" * REPORT_WIDTH)
 
             count = 1
             for attr in missing_attrs:
-                print(indent + f'{count:2.0f}) Missing attribute: {attr['name']}')
+                print(INDENT + f'{count:2.0f}) Missing attribute: {attr['name']}')
                 count += 1
-            print("-" * width)
+            print("-" * REPORT_WIDTH)
             
     def checkMinimalReqs(self):
         '''
@@ -95,13 +94,10 @@ class MDChecker():
                 self.errors.append(result)
     
     def printErrors(self):
-        width = 60
-        indent = '     '
-
-        print(indent + f'Errors: {len(self.errors)}')
-        print("-" * width)
+        print(INDENT + f'Errors: {len(self.errors)}')
+        print("-" * REPORT_WIDTH)
         for e in self.errors:
-            e.printFull(indent)
+            e.printFull(INDENT)
 
 
 class Error():
@@ -109,8 +105,8 @@ class Error():
         self.message = message
         self.attr = attr
     
-    def printFull(self, indent=''):
-        print(indent + f'Error: {self.attr} {self.message}')
+    def printFull(self, INDENT=''):
+        print(INDENT + f'Error: {self.attr} {self.message}')
 
 
 def main(args):
