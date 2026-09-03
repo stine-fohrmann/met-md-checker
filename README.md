@@ -8,9 +8,15 @@ See [https://adc.met.no/submit-data-as-netcdf-cf](https://adc.met.no/submit-data
 ## Current functionality
 
 - checks whether the global attributes of a provided file contain all attributes required by MET
+- checks whether time attributes are formatted correctly
 - contains script for scraping minimal requirements from [https://adc.met.no/submit-data-as-netcdf-cf](https://adc.met.no/submit-data-as-netcdf-cf)
 
 ## Usage
+
+To install all required libraries, run:
+```
+pip install -r met-md-checker/requirements.txt
+```
 
 To check whether a netCDF file complies with the MET requirements, run:
 ```
