@@ -81,17 +81,17 @@ class MDChecker():
         # Print results in terminal
         self.printReport()
     
-    def checkTimeFormat(self, attr_str):
-        from utils import iso_to_dt64
+    # def checkTimeFormat(self, attr_str):
+    #     from utils import iso_to_dt64
 
-        try:    # check if attribute defined
-            time_str = self.given_attrs[attr_str]
-            try:    # check if valid ISO format
-                iso_to_dt64(time_str)
-            except: # return error if invalid date or format
-                return Error(attr=attr_str, message='is invalid date or date format')
-        except: # return error if attribute not defined
-            return Error(attr=attr_str, message='is not defined')
+    #     try:    # check if attribute defined
+    #         time_str = self.given_attrs[attr_str]
+    #         try:    # check if valid ISO format
+    #             iso_to_dt64(time_str)
+    #         except: # return error if invalid date or format
+    #             return Error(attr=attr_str, message='is invalid date or date format')
+    #     except: # return error if attribute not defined
+    #         return Error(attr=attr_str, message='is not defined')
     
     def checkTimeAttrs(self):
         ''' Checks whether the required time attributes are given and formatted in ISO 8601:2004 '''
@@ -108,13 +108,10 @@ class MDChecker():
                 try:    # check if valid ISO format
                     iso_to_dt64(time_str)
                 except: # return error if invalid date or format
-                    result = Error(attr=attr_str, message='is invalid date or date format')
+                    self.errors.append(Error(attr=attr_str, message=f'"{time_str}" is an invalid date or date format'))
             except: # return error if attribute not defined
-                result = Error(attr=attr_str, message='is not defined')
+                self.errors.append(Error(attr=attr_str, message='is not defined'))
 
-            if isinstance(result, Error):
-                self.errors.append(result)
-    
     def checkGeospatial(self):
         '''Checks whether the geospatial bounds are given and are valid values'''
 
@@ -128,22 +125,19 @@ class MDChecker():
                 # verify at least 2 decimal points
                 num_decimals = geo_str[::-1].find('.')
                 if num_decimals < 2:
-                    result = Error(attr=attr_str, message='has too few decimal places. Include at least 2 decimal places.')
+                    self.errors.append(Error(attr=attr_str, message=f'"{geo_str}" has too few decimal places. Include at least 2 decimal places.'))
                 
                 # verify latitude between -90 and 90
                 if (attr_str == 'geospatial_lat_min' or attr_str == 'geospatial_lat_max') and not (-90 <= float(geo_str) <= 90):
                     print(float(geo_str))
-                    result = Error(attr=attr_str, message='is invalid. Must be between -90 and 90.')
+                    self.errors.append(Error(attr=attr_str, message=f'"{geo_str}" is invalid. Must be between -90 and 90.'))
                 
                 # verify longitude between -180 and 180
                 if (attr_str == 'geospatial_lon_min' or attr_str == 'geospatial_lon_max') and not (-180 <= float(geo_str) <= 180):
-                    result = Error(attr=attr_str, message='is invalid. Must be between -180 and 180.')
+                    self.errors.append(Error(attr=attr_str, message=f'"{geo_str}" is invalid. Must be between -180 and 180.'))
                 
             except: # return error if attribute not defined
-                result = Error(attr=attr_str, message='is not defined')   
-
-            if isinstance(result, Error):
-                self.errors.append(result)    
+                self.errors.append(Error(attr=attr_str, message='is not defined')   )
 
     def checkPublisher(self):
         '''Checks whether the publisher information is given correctly'''
@@ -159,22 +153,20 @@ class MDChecker():
 
                 # verify not empty
                 if pub_str.strip() == '':
-                    result = Error(attr=attr_str, message=f'is empty')
+                    self.errors.append(Error(attr=attr_str, message=f'is empty'))
 
                 match attr_str:
                     case 'publisher_url':
                         # validate url
                         if not is_valid_url(pub_str):
-                            result = Error(attr=attr_str, message=f'"{pub_str}" is not a valid URL')
+                            self.errors.append(Error(attr=attr_str, message=f'"{pub_str}" is not a valid URL'))
                     case 'publisher_email':
                         # validate email address
                         if not is_valid_email(pub_str):
-                            result = Error(attr=attr_str, message=f'"{pub_str}" is not a valid email address')
+                            self.errors.append(Error(attr=attr_str, message=f'"{pub_str}" is not a valid email address'))
             except:
-                result = Error(attr=attr_str, message='is not defined')
+                self.errors.append(Error(attr=attr_str, message='is not defined'))
             
-            if isinstance(result, Error):
-                self.errors.append(result)
 
     def printErrors(self):
         print(INDENT + f'Errors: {len(self.errors)}')
