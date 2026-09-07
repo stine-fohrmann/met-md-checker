@@ -131,12 +131,12 @@ class MDChecker():
                     result = Error(attr=attr_str, message='has too few decimal places. Include at least 2 decimal places.')
                 
                 # verify latitude between -90 and 90
-                if (attr_str == 'geospatial_lat_min' or attr_str == 'geospatial_lat_max') and not (-90 < float(geo_str) < 90):
+                if (attr_str == 'geospatial_lat_min' or attr_str == 'geospatial_lat_max') and not (-90 <= float(geo_str) <= 90):
                     print(float(geo_str))
                     result = Error(attr=attr_str, message='is invalid. Must be between -90 and 90.')
                 
                 # verify longitude between -180 and 180
-                if (attr_str == 'geospatial_lon_min' or attr_str == 'geospatial_lon_max') and not (-180 < float(geo_str) < 180):
+                if (attr_str == 'geospatial_lon_min' or attr_str == 'geospatial_lon_max') and not (-180 <= float(geo_str) <= 180):
                     result = Error(attr=attr_str, message='is invalid. Must be between -180 and 180.')
                 
             except: # return error if attribute not defined
