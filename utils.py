@@ -55,3 +55,6 @@ def is_valid_email(email: str):
     reg = re.match("[^@]+@[^@]+\\.[^@]+", email)
 
     return bool(reg)
+
+def split_list(value) -> list[str]:
+    return [item.strip() for item in str(value).split(',') if item.strip()]
