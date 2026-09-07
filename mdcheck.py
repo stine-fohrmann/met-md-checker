@@ -55,10 +55,9 @@ class MDChecker():
 
         # verify geospatial attributes are given and formatted correctly
         self.checkGeospatial()
-
         # verify time attributes are given and formatted correctly
         self.checkTimeAttrs()
-
+        self.checkCreator()
         # verify publisher info is given and valid format
         self.checkPublisher()
 
@@ -66,12 +65,13 @@ class MDChecker():
         # TODO get time attrs from json instead (?)
         required_geo_attrs = ['geospatial_lat_min', 'geospatial_lat_max', 'geospatial_lon_min', 'geospatial_lon_max']
         required_time_attrs = ['time_coverage_start', 'time_coverage_end', 'date_created']
+        req_creator_attrs = ['creator_type', 'creator_name', 'creator_institution', 'creator_email']
         req_publisher_attrs = ['publisher_name', 'publisher_url', 'publisher_institution', 'publisher_email']
 
         # verify other attributes are given
         for attr in self.minimal_attrs:
             # skip time attrs
-            if attr['name'] in required_geo_attrs+required_time_attrs+req_publisher_attrs:
+            if attr['name'] in required_geo_attrs+required_time_attrs+req_publisher_attrs+req_creator_attrs:
                 continue
 
             # check whether required attributes exist  
@@ -131,6 +131,31 @@ class MDChecker():
         for attr in required_geo_attrs:
             self._check(attr, lambda v, a=attr: self._validate_geo(a, v))
     
+    def _validate_creator(self, attr: str, val):
+        from utils import is_valid_email
+        # validate email address
+        if attr == 'creator_email' and not is_valid_email(val):
+            self.errors.append(Error(attr=attr, message=f'"{val}" is not a valid email address'))
+     
+    def checkCreator(self):
+        '''Checks whether creator information is given correctly'''
+        from utils import split_list
+        req_creator_attrs = ['creator_type', 'creator_name', 'creator_institution', 'creator_email']
+
+        # validate existence and format of each individual attribute
+        for attr in req_creator_attrs:
+            self._check(attr, lambda v, a=attr: self._validate_creator(a, v))
+        
+        # cross-attribute: validate lists have same length
+        num_creators = set()
+        for attr in req_creator_attrs:
+            try:
+                val = self.given_attrs[attr]
+                num_creators.add(len(split_list(val)))
+            except KeyError:
+                continue
+        if not len(num_creators) == 1:
+            self.errors.append(InconsistentLengthError(attrs=req_creator_attrs))
     
     def _validate_pub(self, attr: str, val):
         from utils import is_valid_url, is_valid_email
@@ -167,6 +192,13 @@ class Error():
     def printFull(self, INDENT=''):
         print(INDENT + f'Error: {self.attr} {self.message}')
 
+class InconsistentLengthError(Error):
+    def __init__(self, attrs: list, message='don\'t have the same number of elements.'):
+        self.attrs = attrs
+        self.message = message
+    
+    def printFull(self, INDENT=''):
+        print(INDENT + f'Error: {", ".join([a for a in self.attrs])} {self.message}')
 
 def main(args):
     # Get minimal required attrs
