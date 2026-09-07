@@ -59,15 +59,19 @@ class MDChecker():
         # verify time attributes are given and formatted correctly
         self.checkTimeAttrs()
 
+        # verify publisher info is given and valid format
+        self.checkPublisher()
+
         # remove time attributes from list to be checked
         # TODO get time attrs from json instead (?)
         required_geo_attrs = ['geospatial_lat_min', 'geospatial_lat_max', 'geospatial_lon_min', 'geospatial_lon_max']
         required_time_attrs = ['time_coverage_start', 'time_coverage_end', 'date_created']
+        req_publisher_attrs = ['publisher_name', 'publisher_url', 'publisher_institution', 'publisher_email']
 
         # verify other attributes are given
         for attr in self.minimal_attrs:
             # skip time attrs
-            if attr['name'] in required_geo_attrs+required_time_attrs:
+            if attr['name'] in required_geo_attrs+required_time_attrs+req_publisher_attrs:
                 continue
 
             # check whether required attributes exist  
@@ -139,14 +143,48 @@ class MDChecker():
                 result = Error(attr=attr_str, message='is not defined')   
 
             if isinstance(result, Error):
-                self.errors.append(result)        
-    
+                self.errors.append(result)    
+
+    def checkPublisher(self):
+        '''Checks whether the publisher information is given correctly'''
+        from utils import is_valid_url, is_valid_email
+
+        req_publisher_attrs = ['publisher_name', 'publisher_url', 'publisher_institution', 'publisher_email']
+
+        # check if given
+        for attr_str in req_publisher_attrs:
+            result = None
+            try:
+                pub_str = self.given_attrs[attr_str]
+
+                # verify not empty
+                if pub_str.strip() == '':
+                    result = Error(attr=attr_str, message=f'is empty')
+
+                match attr_str:
+                    case 'publisher_url':
+                        # validate url
+                        if not is_valid_url(pub_str):
+                            result = Error(attr=attr_str, message=f'"{pub_str}" is not a valid URL')
+                    case 'publisher_email':
+                        # validate email address
+                        if not is_valid_email(pub_str):
+                            result = Error(attr=attr_str, message=f'"{pub_str}" is not a valid email address')
+            except:
+                result = Error(attr=attr_str, message='is not defined')
+            
+            if isinstance(result, Error):
+                self.errors.append(result)
+
     def printErrors(self):
         print(INDENT + f'Errors: {len(self.errors)}')
         print("-" * REPORT_WIDTH)
         for e in self.errors:
             e.printFull(INDENT)
-
+    
+    def printGivenAttrs(self):
+        for key, val in self.given_attrs.items():
+            print(f'{key}: {val}')
 
 class Error():
     def __init__(self, attr, message=None):
