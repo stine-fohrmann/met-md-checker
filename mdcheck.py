@@ -95,22 +95,7 @@ class MDChecker():
         
         if validate:
             validate(val)
-    
-    def _validate_time(self, attr: str, val):
-        from utils import iso_to_dt64
 
-        # validate ISO format
-        try:
-            iso_to_dt64(val)
-        except ValueError:
-            self.errors.append(Error(attr=attr, message=f'"{val}" is an invalid date or date format'))
-
-    def checkTimeAttrs(self):
-        ''' Checks whether the required time attributes are given and formatted in ISO 8601:2004 '''
-        required_time_attrs = ['time_coverage_start', 'time_coverage_end', 'date_created']
-        for attr in required_time_attrs:
-            self._check(attr, lambda v, a=attr: self._validate_time(a, v))
-    
     def _validate_geo(self, attr: str, val):
         v = float(val)
         # verify at least 2 decimal points
@@ -130,6 +115,21 @@ class MDChecker():
         required_geo_attrs = ['geospatial_lat_min', 'geospatial_lat_max', 'geospatial_lon_min', 'geospatial_lon_max']
         for attr in required_geo_attrs:
             self._check(attr, lambda v, a=attr: self._validate_geo(a, v))
+    
+    def _validate_time(self, attr: str, val):
+        from utils import iso_to_dt64
+
+        # validate ISO format
+        try:
+            iso_to_dt64(val)
+        except ValueError:
+            self.errors.append(Error(attr=attr, message=f'"{val}" is an invalid date or date format'))
+
+    def checkTimeAttrs(self):
+        ''' Checks whether the required time attributes are given and formatted in ISO 8601:2004 '''
+        required_time_attrs = ['time_coverage_start', 'time_coverage_end', 'date_created']
+        for attr in required_time_attrs:
+            self._check(attr, lambda v, a=attr: self._validate_time(a, v))
     
     def _validate_creator(self, attr: str, val):
         from utils import is_valid_email
