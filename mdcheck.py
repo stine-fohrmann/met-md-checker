@@ -57,6 +57,7 @@ class MDChecker():
         self.checkGeospatial()
         # verify time attributes are given and formatted correctly
         self.checkTimeAttrs()
+        self.checkLicense()
         self.checkCreator()
         # verify publisher info is given and valid format
         self.checkPublisher()
@@ -67,11 +68,12 @@ class MDChecker():
         required_time_attrs = ['time_coverage_start', 'time_coverage_end', 'date_created']
         req_creator_attrs = ['creator_type', 'creator_name', 'creator_institution', 'creator_email']
         req_publisher_attrs = ['publisher_name', 'publisher_url', 'publisher_institution', 'publisher_email']
+        other = ['license']
 
         # verify other attributes are given
         for attr in self.minimal_attrs:
             # skip time attrs
-            if attr['name'] in required_geo_attrs+required_time_attrs+req_publisher_attrs+req_creator_attrs:
+            if attr['name'] in required_geo_attrs+required_time_attrs+req_publisher_attrs+req_creator_attrs+other:
                 continue
 
             # check whether required attributes exist  
@@ -131,6 +133,38 @@ class MDChecker():
         for attr in required_time_attrs:
             self._check(attr, lambda v, a=attr: self._validate_time(a, v))
     
+    def _validate_license(self, attr: str, val):
+        # split into url and id
+        licenselist = [string.replace(')', '').strip() for string in val.split('(')]
+
+        is_valid_license = False
+        
+        if len(licenselist) == 2:
+            lic_url = licenselist[0]
+            lic_id = licenselist[1]
+
+            # process url to match reference urls
+            lic_url = lic_url.replace('http://', 'https://')
+            if not lic_url.endswith('.html'):
+                lic_url += '.html'
+
+            with open('met-md-checker/data/licenses.json', 'r') as file:
+                licenses = json.load(file)
+            
+            for l in licenses['licenses']:
+                if l['licenseId'] == lic_id:
+                    # if license id found, check link
+                    if l['reference'] == lic_url:
+                        is_valid_license = True
+
+        if not is_valid_license:
+            self.errors.append(Error(attr, message=f'"{val}" is not a valid standard license. Provide the license as "URL (identifier)".'))
+
+    def checkLicense(self):
+        # validate existence and format of each individual attribute
+        attr = 'license'
+        self._check(attr, lambda v, a=attr: self._validate_license(a, v))
+
     def _validate_creator(self, attr: str, val):
         from utils import is_valid_email
         # validate email address
