@@ -1,0 +1,155 @@
+
+attributes:
+  title:
+    type: ACDD/CF
+    description: 'A short phrase or sentence describing the dataset. In many discovery systems, the title will be displayed in the results list from a search, and therefore should be human readable and reasonable to display in a list of such names. This attribute is also recommended by the NetCDF Users Guide and the CF conventions.'
+    comments : Provided in English
+    checks:
+      - id: title/exists
+        type: exists
+        severity: error
+        message: is not defined.
+      - id: title/nonempty
+        type: nonempty
+        conditions: 
+          - title/exists
+        severity: error
+        message: is empty.
+  
+  summary:
+    type: ACDD
+    description: 'A paragraph describing the dataset, analogous to an abstract for a paper.'
+    comments: Provided in English
+    checks:
+      - id: summary/exists
+        type: exists
+        severity: error
+        message: is not defined.
+      - id: summary/nonempty
+        type: nonempty
+        conditions: 
+          - summary/exists
+        severity: warning
+        message: is empty.
+  
+  keywords:
+    type: ACDD
+    description: 'A comma-separated list of keywords and/or phrases. Keywords may be common words or phrases, terms from a controlled vocabulary.'
+    comments: "If keywords are extracted from e.g. GCMD Science Keywords, add keywords_vocabulary='GCMDSK' and prefix in any case each keyword with the appropriate prefix."
+    checks:
+      - id: keywords/exists
+        type: exists
+        severity: error
+        message: 'is not defined.'
+      - id: keywords/nonempty
+        type: nonempty
+        conditions:
+          - keywords/exists
+        severity: error
+        message: 'is empty.'
+      # Verify that no keyword entry is empty
+      - id: keywords/entries_nonempty
+        type: entries_nonempty
+        conditions:
+          - keywords/exists
+          - keywords/nonempty
+        severity: error
+        message: contains an empty entry.
+      # Verify that each keyword entry has a prefix
+      - id: keywords/entries_prefixed
+        type: entries_prefixed
+        conditions:
+          - keywords/exists
+          - keywords/nonempty
+        severity: error
+        message: |
+          contains a keyword without a vocabulary prefix.
+          Prefix each keyword with the correct vocabulary prefix.
+          Example: "GCMDSK:EARTH SCIENCE > OCEANS"
+      # Verify that at least one GCMD Science Keyword is defined and prefixed with "GCMDSK:"
+      - id: keywords/gcmdsk_present
+        type: gcmdsk_present
+        conditions:
+          - keywords/exists
+          - keywords/nonempty
+          - keywords/entries_prefixed
+        severity: error
+        message: 'contains no GCMD science keyword. Include at least one keyword prefixed with "GCMDSK:"'
+      # Verify that GCMD science keyword is valid
+      - id: keywords/valid_gcmdsk
+        type: valid_gcmdsk
+        conditions:
+          - keywords/exists
+          - keywords/nonempty
+          - keywords/entries_prefixed
+          - keywords/gcmdsk_present
+        severity: error
+        message: |
+          contains an invalid GCMD science keyword.
+          Include the full path of valid keywords formatted like "GCMDSK:[category] > [topic] > [...]".
+
+  keywords_vocabulary:
+    type: ACDD
+    description: If you are using a controlled vocabulary for the words/phrases in your "keywords" attribute, this is the unique name or identifier of the vocabulary from which keywords are taken. If more than one keyword vocabulary is used, each may be presented with a prefix and a following comma, so that keywords may optionally be prefixed with the controlled vocabulary key.
+    comments: "If more than one keyword vocabulary is used, each may be presented with a prefix and a following comma. E.g.: ‘GCMDSK:GCMD Science Keywords, ..’ Keywords should in this case be prefixed with the appropriate controlled vocabulary key. When keywords_vocabulary is not specified the default value of None will be used. "
+    checks:
+      - id: keywords_vocabulary/exists
+        type: exists
+        severity: error
+        message: 'is not defined.'
+      - id: keywords_vocabulary/nonempty
+        type: nonempty
+        conditions:
+          - keywords_vocabulary/exists
+        severity: error
+        message: 'is empty.'
+      # Verify that no entry is empty
+      - id: keywords_vocabulary/entries_nonempty
+        type: entries_nonempty
+        conditions:
+          - keywords_vocabulary/exists
+          - keywords_vocabulary/nonempty
+        severity: error
+        message: contains an empty entry.
+      # Verify that each entry has a prefix
+      - id: keywords_vocabulary/entries_prefixed
+        type: entries_prefixed
+        conditions:
+          - keywords_vocabulary/exists
+          - keywords_vocabulary/nonempty
+          - keywords_vocabulary/entries_nonempty
+        severity: error
+        message: |
+          contains a vocabulary without a prefix.
+          Prefix each vocabulary with the correct prefix.
+          Example: "GCMDSK:GCMD Science Keywords:https://gcmd.earthdata.nasa.gov/kms/concepts/concept_scheme/sciencekeywords"
+      # Verify that at least reference to GCMDSK is given
+      - id: keywords_vocabulary/gcmdsk_present
+        type: gcmdsk_present
+        conditions:
+          - keywords_vocabulary/exists
+          - keywords_vocabulary/nonempty
+          - keywords_vocabulary/entries_nonempty
+          - keywords_vocabulary/entries_prefixed
+        severity: error
+        message: |
+          contains no reference to GCMD science keywords.
+          Include a reference to GCMD science keywords in the following format:
+          "GCMDSK:GCMD Science Keywords:https://gcmd.earthdata.nasa.gov/kms/concepts/concept_scheme/sciencekeywords"
+  
+# cross_checks:
+#   # Verify that each prefix in 'keywords' is used in 'keywords_vocabulary' and vice versa
+#   - id: cc/keywords_map_to_vocabulary
+#     type: keywords_map_to_vocabulary
+#     involved_attributes: [keywords, keywords_vocabulary]
+#     conditions: # list of checks that must pass before cross-checking
+#       - keywords/exists
+#       - keywords/nonempty
+#       - keywords/entries_nonempty
+#       - keywords/entries_prefixed
+#       - keywords_vocabulary/exists
+#       - keywords_vocabulary/nonempty
+#       - keywords_vocabulary/entries_nonempty
+#       - keywords_vocabulary/entries_prefixed
+#     severity: error
+#     message: mismatch between keywords and vocabulary.
