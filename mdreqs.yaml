@@ -137,19 +137,19 @@ attributes:
           Include a reference to GCMD science keywords in the following format:
           "GCMDSK:GCMD Science Keywords:https://gcmd.earthdata.nasa.gov/kms/concepts/concept_scheme/sciencekeywords"
   
-# cross_checks:
-#   # Verify that each prefix in 'keywords' is used in 'keywords_vocabulary' and vice versa
-#   - id: cc/keywords_map_to_vocabulary
-#     type: keywords_map_to_vocabulary
-#     involved_attributes: [keywords, keywords_vocabulary]
-#     conditions: # list of checks that must pass before cross-checking
-#       - keywords/exists
-#       - keywords/nonempty
-#       - keywords/entries_nonempty
-#       - keywords/entries_prefixed
-#       - keywords_vocabulary/exists
-#       - keywords_vocabulary/nonempty
-#       - keywords_vocabulary/entries_nonempty
-#       - keywords_vocabulary/entries_prefixed
-#     severity: error
-#     message: mismatch between keywords and vocabulary.
+cross_checks:
+  # Verify that each prefix in 'keywords' is used in 'keywords_vocabulary' and vice versa
+  - id: cc/keywords_map_to_vocabulary
+    type: keywords_map_to_vocabulary
+    involved_attributes: [keywords, keywords_vocabulary]
+    conditions: # list of checks that must pass before cross-checking
+      - keywords/exists
+      - keywords/nonempty
+      - keywords/entries_nonempty
+      - keywords/entries_prefixed
+      - keywords_vocabulary/exists
+      - keywords_vocabulary/nonempty
+      - keywords_vocabulary/entries_nonempty
+      - keywords_vocabulary/entries_prefixed
+    severity: error
+    message: prefix mismatch between keywords and vocabulary.
