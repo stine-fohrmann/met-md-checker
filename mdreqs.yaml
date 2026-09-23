@@ -137,6 +137,154 @@ attributes:
           Include a reference to GCMD science keywords in the following format:
           "GCMDSK:GCMD Science Keywords:https://gcmd.earthdata.nasa.gov/kms/concepts/concept_scheme/sciencekeywords"
   
+  geospatial_lat_min:
+    type: ACDD
+    description: Describes a simple lower latitude limit; may be part of a 2- or 3-dimensional bounding region. Geospatial_lat_min specifies the southernmost latitude covered by the dataset. Must be decimal degrees north.
+    comments: Use at least 2 decimals. This must be decimal degrees north.
+    checks:
+      - id: geospatial_lat_min/exists
+        type: exists
+        severity: error
+        message: is not defined.
+      - id: geospatial_lat_min/nonempty
+        type: nonempty
+        severity: error
+        message: is empty.
+        conditions:
+          - geospatial_lat_min/exists
+      # Verify that the latitude is a number between -90 and 90
+      - id: geospatial_lat_min/valid_lat
+        type: is_between
+        args:
+          min: -90
+          max: 90
+        severity: error
+        message: has an invalid value. Must be a number between -90 and 90.
+        conditions:
+          - geospatial_lat_min/exists
+          - geospatial_lat_min/nonempty
+      # Verify that at least 2 decimal points are included
+      - id: geospatial_lat_min/min_2_decs
+        type: min_decimals
+        args:
+          min_decs: 2
+        severity: error
+        message: has too few decimal points. Include at least 2 decimal points.
+        conditions:
+          - geospatial_lat_min/exists
+          - geospatial_lat_min/nonempty
+  
+  geospatial_lat_max:
+    type: ACDD
+    description: Describes a simple upper latitude limit; may be part of a 2- or 3-dimensional bounding region. Geospatial_lat_max specifies the northernmost latitude covered by the dataset. Must be decimal degrees north.
+    comments: Use at least 2 decimals. This must be decimal degrees north.
+    checks:
+      - id: geospatial_lat_max/exists
+        type: exists
+        severity: error
+        message: 'is not defined.'
+      - id: geospatial_lat_max/nonempty
+        type: nonempty
+        severity: error
+        message: 'is empty.'
+        conditions:
+          - geospatial_lat_max/exists
+      # Verify that the latitude is a number between -90 and 90
+      - id: geospatial_lat_max/valid_lat
+        type: is_between
+        severity: error
+        message: has an invalid value. Must be a number between -90 and 90.
+        args:
+          min: -90
+          max: 90
+        conditions:
+          - geospatial_lat_max/exists
+          - geospatial_lat_max/nonempty
+      # Verify that at least 2 decimal points are included
+      - id: geospatial_lat_max/min_2_decs
+        type: min_decimals
+        args:
+          min_decs: 2
+        severity: error
+        message: has too few decimal points. Include at least 2 decimal points.
+        conditions:
+          - geospatial_lat_max/exists
+          - geospatial_lat_max/nonempty
+  
+  geospatial_lon_min:
+    type: ACDD
+    description: Describes a simple longitude limit; may be part of a 2- or 3-dimensional bounding region. geospatial_lon_min specifies the westernmost longitude covered by the dataset. See also geospatial_lon_max. Must be decimal degrees east (negative westwards).
+    comments: Use at least 2 decimals. This must be decimal degrees east (negative westwards).
+    checks:
+      - id: geospatial_lon_min/exists
+        type: exists
+        severity: error
+        message: is not defined.
+      - id: geospatial_lon_min/nonempty
+        type: nonempty
+        severity: error
+        message: is empty.
+        conditions:
+          - geospatial_lon_min/exists
+      # Verify that longitude is a number between -180 and 180
+      - id: geospatial_lon_min/valid_lon
+        type: is_between
+        args:
+          min: -180
+          max: 180
+        severity: error
+        message: has an invalid value. Must be a number between -180 and 180.
+        conditions:
+          - geospatial_lon_min/exists
+          - geospatial_lon_min/nonempty
+      # Verify that at least 2 decimal points are included
+      - id: geospatial_lon_min/min_2_decs
+        type: min_decimals
+        args:
+          min_decs: 2
+        severity: error
+        message: has too few decimal points. Include at least 2 decimal points.
+        conditions:
+          - geospatial_lon_min/exists
+          - geospatial_lon_min/nonempty
+  
+  geospatial_lon_max:
+    type: ACDD
+    description: Describes a simple longitude limit; may be part of a 2- or 3-dimensional bounding region. geospatial_lon_max specifies the easternmost longitude covered by the dataset. Must be decimal degrees east (negative westwards).
+    comments: Use at least 2 decimals. This must be decimal degrees east (negative westwards).
+    checks:
+      - id: geospatial_lon_max/exists
+        type: exists
+        severity: error
+        message: is not defined.
+      - id: geospatial_lon_max/nonempty
+        type: nonempty
+        severity: error
+        message: is empty.
+        conditions:
+          - geospatial_lon_max/exists
+      # Verify that longitude is a number between -180 and 180
+      - id: geospatial_lon_max/valid_lon
+        type: is_between
+        args:
+          min: -180
+          max: 180
+        severity: error
+        message: has an invalid value. Must be a number between -180 and 180.
+        conditions:
+          - geospatial_lon_max/exists
+          - geospatial_lon_max/nonempty
+      # Verify that at least 2 decimal points are included
+      - id: geospatial_lon_max/min_2_decs
+        type: min_decimals
+        args:
+          min_decs: 2
+        severity: error
+        message: has too few decimal points. Include at least 2 decimal points.
+        conditions:
+          - geospatial_lon_max/exists
+          - geospatial_lon_max/nonempty
+
 cross_checks:
   # Verify that each prefix in 'keywords' is used in 'keywords_vocabulary' and vice versa
   - id: cc/keywords_map_to_vocabulary
