@@ -285,6 +285,105 @@ attributes:
           - geospatial_lon_max/exists
           - geospatial_lon_max/nonempty
 
+  time_coverage_start:
+    type: ACDD
+    description: Describes the time of the first data point in the data set. Use the ISO 8601:2004 date format, preferably the extended format as recommended in the Attribute Content Guidance section. I.e. YYYY-MM-DDTHH:MM:SSZ (always use UTC).
+    comments:
+    checks:
+      - id: time_coverage_start/exists
+        type: exists
+        severity: error
+        message: is not defined.
+      - id: time_coverage_start/nonempty
+        type: nonempty
+        severity: error
+        message: is empty.
+        conditions:
+          - time_coverage_start/exists
+      # Verify that the time stamp is a valid time in ISO 8601:2004 format
+      - id: time_coverage_start/correct_time_format
+        type: iso_8601_2004
+        severity: error
+        message: is not in ISO 8601:2004 format. Use YYYY-MM-DDTHH:MM:SSZ (always use UTC).
+        conditions:
+          - time_coverage_start/exists
+          - time_coverage_start/nonempty
+      # Verify that the time stamp is a valid datetime
+      - id: time_coverage_start/valid_date_time
+        type: valid_date_time
+        severity: error
+        message: is not a valid time.
+        conditions:
+          - time_coverage_start/exists
+          - time_coverage_start/nonempty
+          - time_coverage_start/correct_time_format
+
+  time_coverage_end:
+    type: ACDD
+    description: Describes the time of the last data point in the data set. Use ISO 8601:2004 date format, preferably the extended format as recommended in the Attribute Content Guidance section. I.e. YYYY-MM-DDTHH:MM:SSZ (always use UTC).
+    comments: If the file is being appended with new data, this can be left out and the dataset will then be considered an ongoing effort.
+    checks:
+      - id: time_coverage_end/exists
+        type: exists
+        severity: error
+        message: is not defined.
+      - id: time_coverage_end/nonempty
+        type: nonempty
+        severity: error
+        message: is empty.
+        conditions:
+          - time_coverage_end/exists
+      # Verify that the time stamp is a valid time in ISO 8601:2004 format
+      - id: time_coverage_end/correct_time_format
+        type: iso_8601_2004
+        severity: error
+        message: is not in ISO 8601:2004 format. Use YYYY-MM-DDTHH:MM:SSZ (always use UTC).
+        conditions:
+          - time_coverage_end/exists
+          - time_coverage_end/nonempty
+      # Verify that the time stamp is a valid datetime
+      - id: time_coverage_end/valid_date_time
+        type: valid_date_time
+        severity: error
+        message: is not a valid time.
+        conditions:
+          - time_coverage_end/exists
+          - time_coverage_end/nonempty
+          - time_coverage_end/correct_time_format
+    
+  date_created:
+    type: ACDD
+    description: The date on which this version of the data was created. (Modification of values implies a new version, hence this would be assigned the date of the most recent values modification.) Metadata changes are not considered when assigning the date_created. The ISO 8601:2004 extended date format is recommended, as described in the Attribute Content Guidance section. E.g. 2020-10-20T12:35:00Z.
+    comments: If date_created is not provided, a default current datetime stamp will be generated.
+    checks:
+      - id: date_created/exists
+        type: exists
+        severity: error
+        message: is not defined.
+      - id: date_created/nonempty
+        type: nonempty
+        severity: error
+        message: is empty.
+        conditions:
+          - date_created/exists
+      # Verify that the time stamp is a valid time in ISO 8601:2004 format
+      - id: date_created/correct_time_format
+        type: iso_8601_2004
+        severity: error
+        message: is not in ISO 8601:2004 format. Use YYYY-MM-DDTHH:MM:SSZ (always use UTC).
+        conditions:
+          - date_created/exists
+          - date_created/nonempty
+      # Verify that the time stamp is a valid datetime
+      - id: date_created/valid_date_time
+        type: valid_date_time
+        severity: error
+        message: is not a valid time.
+        conditions:
+          - date_created/exists
+          - date_created/nonempty
+          - date_created/correct_time_format
+
 cross_checks:
   # Verify that each prefix in 'keywords' is used in 'keywords_vocabulary' and vice versa
   - id: cc/keywords_map_to_vocabulary
