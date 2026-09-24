@@ -384,6 +384,41 @@ attributes:
           - date_created/nonempty
           - date_created/correct_time_format
 
+  license:
+    type: ACDD
+    description: Provide the URL and identifier to a standard license. It is strongly recommended to use identifiers and URL's from https://spdx.org/licenses/ and to use a form similar to <URL> (<Identifier>) using elements from the SPDX source listed above.
+    comments: 'The recommended way to provide this information is license: "http://spdx.org/licenses/CC-BY-4.0 (CC-BY-4.0)". If a standard license cannot be parsed this field will be extracted into free text.'
+    checks:
+      - id: license/exists
+        type: exists
+        severity: error
+        message: is not defined.
+      - id: license/nonempty
+        type: nonempty
+        severity: error
+        message: is empty.
+        conditions:
+          - license/exists
+      # Verify each entry has format <URL> (<Identifier>)
+      - id: license/formatted_correctly
+        type: license_formatted_correctly
+        severity: error
+        message: contains an incorrectly formatted entry. Use the form "<URL> (<Identifier>)" and separate entries with a comma.
+        conditions:
+          - license/exists
+          - license/nonempty
+      # Verify given license is a SPDX license
+      - id: license/valid_spdx_license
+        type: spdx_license
+        severity: error
+        message: |
+          is not a valid SPDX license.
+          Include a standard license from https://spdx.org/licenses/.
+        conditions:
+          - license/exists
+          - license/nonempty
+          - license/formatted_correctly
+
 cross_checks:
   # Verify that each prefix in 'keywords' is used in 'keywords_vocabulary' and vice versa
   - id: cc/keywords_map_to_vocabulary
