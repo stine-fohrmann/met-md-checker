@@ -451,7 +451,30 @@ attributes:
           - creator_type/exists
           - creator_type/nonempty
           - creator_type/entries_nonempty
-
+  
+  creator_name:
+    type: ACDD
+    description: "The name of the person (or other creator type specified by the creator_type attribute) principally responsible for creating this data."
+    comments: "Do not use ',' except for separating elements. Write names as 'First1 Last1, First2 Last2'. Consistency across comma separated lists for all creator_* attributes are required."
+    checks:
+      - id: creator_name/exists
+        type: exists
+        severity: error
+        message: is not defined.
+      - id: creator_name/nonempty
+        type: nonempty
+        severity: error
+        message: is empty.
+        conditions:
+          - creator_name/exists
+      # Verify all entries are nonempty
+      - id: creator_name/entries_nonempty
+        type: entries_nonempty
+        severity: error
+        message: contains an empty entry.
+        conditions:
+          - creator_name/exists
+          - creator_name/nonempty
 
 cross_checks:
   # Verify that each prefix in 'keywords' is used in 'keywords_vocabulary' and vice versa
