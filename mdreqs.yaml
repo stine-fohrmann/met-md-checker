@@ -476,6 +476,22 @@ attributes:
           - creator_name/exists
           - creator_name/nonempty
 
+  creator_institution:
+    type: ACDD
+    description: "The name of the person (or other creator type specified by the creator_type attribute) principally responsible for creating this data."
+    comments: "Do not use ',' except for separating elements. Write names as 'First1 Last1, First2 Last2'. Consistency across comma separated lists for all creator_* attributes are required."
+    checks:
+      - id: creator_institution/exists
+        type: exists
+        severity: error
+        message: is not defined.
+      - id: creator_institution/nonempty
+        type: nonempty
+        severity: error
+        message: is empty.
+        conditions:
+          - creator_institution/exists
+
 cross_checks:
   # Verify that each prefix in 'keywords' is used in 'keywords_vocabulary' and vice versa
   - id: cc/keywords_map_to_vocabulary
