@@ -492,6 +492,38 @@ attributes:
         conditions:
           - creator_institution/exists
 
+  creator_email:
+    type: ACDD
+    description: "The name of the person (or other creator type specified by the creator_type attribute) principally responsible for creating this data."
+    comments: "Do not use ',' except for separating elements. Write names as 'First1 Last1, First2 Last2'. Consistency across comma separated lists for all creator_* attributes are required."
+    checks:
+      - id: creator_email/exists
+        type: exists
+        severity: error
+        message: is not defined.
+      - id: creator_email/nonempty
+        type: nonempty
+        severity: error
+        message: is empty.
+        conditions:
+          - creator_email/exists
+      # Verify all entries are nonempty
+      - id: creator_email/entries_nonempty
+        type: entries_nonempty
+        severity: error
+        message: contains an empty entry.
+        conditions:
+          - creator_email/exists
+          - creator_email/nonempty
+      # Verify each entry is a valid email address
+      - id: creator_email/enstries_valid
+        type: email_addresses_valid
+        severity: warning
+        message: contains an invalid email address.
+        conditions:
+          - creator_email/exists
+          - creator_email/nonempty
+
 cross_checks:
   # Verify that each prefix in 'keywords' is used in 'keywords_vocabulary' and vice versa
   - id: cc/keywords_map_to_vocabulary
