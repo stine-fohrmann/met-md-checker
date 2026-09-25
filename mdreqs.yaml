@@ -540,3 +540,25 @@ cross_checks:
       - keywords_vocabulary/entries_prefixed
     severity: error
     message: prefix mismatch between keywords and vocabulary.
+  # Verify all 'creator_*' attributes have the same number of entries
+  - id: cc/creator_attrs_same_length
+    type: same_length
+    involved_attributes:
+      - creator_type
+      - creator_name
+      - creator_institution
+      - creator_email
+    conditions:
+      - creator_type/exists
+      - creator_name/exists
+      - creator_institution/exists
+      - creator_email/exists
+      - creator_type/nonempty
+      - creator_name/nonempty
+      - creator_institution/nonempty
+      - creator_email/nonempty
+    severity: error
+    message: |
+      inconsistent length in creator_* attributes.
+      All creator_* attributes must have the same number of elements.
+      Separate elements with a comma. 
