@@ -419,6 +419,40 @@ attributes:
           - license/nonempty
           - license/formatted_correctly
 
+  creator_type:
+    type: ACDD
+    description: "Specifies the type of creator with one of the following: 'person', 'group', 'institution', or 'position'. If this attribute is not specified, the creator is assumed to be a person."
+    comments: "Do not use ',' except for separating elements. Use this for principal Investigator. Consistency across comma separated lists for all creator_* attributes are required."
+    checks:
+      - id: creator_type/exists
+        type: exists
+        severity: error
+        message: is not defined.
+      - id: creator_type/nonempty
+        type: nonempty
+        severity: error
+        message: is empty.
+        conditions:
+          - creator_type/exists
+      # Verify all entries are nonempty
+      - id: creator_type/entries_nonempty
+        type: entries_nonempty
+        severity: error
+        message: contains an empty entry.
+        conditions:
+          - creator_type/exists
+          - creator_type/nonempty
+      # Verify each entry is one of 'person', 'group', 'institution', or 'position'
+      - id: creator_type/entries_valid
+        type: creator_types_valid
+        severity: error
+        message: contains an invalid creator type. Each type must be one of 'person', 'group', 'institution', or 'position'.
+        conditions:
+          - creator_type/exists
+          - creator_type/nonempty
+          - creator_type/entries_nonempty
+
+
 cross_checks:
   # Verify that each prefix in 'keywords' is used in 'keywords_vocabulary' and vice versa
   - id: cc/keywords_map_to_vocabulary
