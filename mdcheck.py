@@ -120,12 +120,12 @@ class MDChecker():
             check_type = check.get('type')
             conditions = check.get('conditions')
             self.checks_tracker['cc'] = []
+            attrs = check.get('involved_attributes')
+            values = [self.attrs[a] for a in attrs]
 
             # Execute cross check if conditions are met
             if conditions:
                 if has_passed(conditions):
-                    attrs = check.get('involved_attributes')
-                    values = [self.attrs[a] for a in attrs]
                     check_passed = CROSSCHECK_FUNCS[check_type](values)
                 else:
                     continue
@@ -139,9 +139,9 @@ class MDChecker():
             if not check_passed:
                 match check.get('severity'):
                     case 'error':
-                        self.warnings.append(MDWarning(attr='cross-check', message=check.get('message')))
+                        self.errors.append(MDError(attr='cross-check', message=check.get('message')))
                     case 'warning':
-                        self.errors.append(Error(attr='cross-check', message=check.get('message')))
+                        self.warnings.append(MDWarning(attr='cross-check', message=check.get('message')))
 
 
 def main(args):
