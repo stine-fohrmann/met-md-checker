@@ -7,9 +7,10 @@ See [https://adc.met.no/submit-data-as-netcdf-cf](https://adc.met.no/submit-data
 
 ## Current functionality
 
-- checks whether the global attributes of a provided file contain all attributes required by MET
-- checks whether time attributes are formatted correctly
-- contains script for scraping minimal requirements from [https://adc.met.no/submit-data-as-netcdf-cf](https://adc.met.no/submit-data-as-netcdf-cf)
+- checks the global attributes of a provided file against the METNO requirements (see [https://adc.met.no/submit-data-as-netcdf-cf](https://adc.met.no/submit-data-as-netcdf-cf)) and prints an overview report to the CLI
+- checks whether the required attributes are given and formatted correctly
+- requirements are defined in [mdreqs.yaml](mdreqs.yaml), including which checks should be performed for each mandatory attribute
+- currently, only the required attributes are checked, not the optional ones
 
 ## Usage
 
@@ -22,10 +23,3 @@ To check whether a netCDF file complies with the MET requirements, run:
 ```
 met-md-checker/mdcheck path/to/file.nc 
 ```
-
-To scrape the minimal requirements, run: 
-
-```
-python met-md-checker/scrape_specs.py
-```
-The requirements will be saved at `met-md-checker/minimal_attrs.json`
