@@ -516,13 +516,84 @@ attributes:
           - creator_email/exists
           - creator_email/nonempty
       # Verify each entry is a valid email address
-      - id: creator_email/enstries_valid
+      - id: creator_email/entries_valid
         type: email_addresses_valid
         severity: warning
         message: contains an invalid email address.
         conditions:
           - creator_email/exists
           - creator_email/nonempty
+
+  publisher_name:
+    type: ACDD
+    description: It specifies the name of the publisher.
+    comments: This is the name of the data center publishing the data. The recommended form is “long name (short name)”
+    checks:
+      - id: publisher_name/exists
+        type: exists
+        severity: error
+        message: is not defined.
+      - id: publisher_name/nonempty
+        type: nonempty
+        severity: error
+        message: is empty.
+        conditions:
+          - publisher_name/exists
+
+  publisher_url:
+    type: ACDD
+    description: The URL of the publisher.
+    comments:
+    checks:
+      - id: publisher_url/exists
+        type: exists
+        severity: error
+        message: is not defined.
+      - id: publisher_url/nonempty
+        type: nonempty
+        severity: error
+        message: is empty.
+        conditions:
+          - publisher_url/exists
+  
+  publisher_institution:
+    type: ACDD
+    description: It specifies the institution of the publisher.
+    comments: This is the name of the institution publishing the data. For a publisher of type "institution" this is often the same as publisher_name. 
+    checks:
+      - id: publisher_institution/exists
+        type: exists
+        severity: error
+        message: is not defined.
+      - id: publisher_institution/nonempty
+        type: nonempty
+        severity: error
+        message: is empty.
+        conditions:
+          - publisher_institution/exists
+  
+  publisher_email:
+    type: ACDD
+    description: The email of the publisher or publisher contact.
+    comments:
+    checks:
+      - id: publisher_email/exists
+        type: exists
+        severity: error
+        message: is not defined.
+      - id: publisher_email/nonempty
+        type: nonempty
+        severity: error
+        message: is empty.
+        conditions:
+          - publisher_email/exists
+      - id: publisher_email/valid_entry
+        type: email_addresses_valid
+        severity: warning
+        message: is not a valid email address.
+        conditions:
+          - publisher_email/exists
+          - publisher_email/nonempty
 
 cross_checks:
   # Verify that each prefix in 'keywords' is used in 'keywords_vocabulary' and vice versa
