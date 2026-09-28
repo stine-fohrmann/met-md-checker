@@ -78,7 +78,7 @@ def check_iso_8601_2004_time_format(value: str) -> bool:
 def check_valid_date_time(value: str) -> bool:
     ''' Checks whether a string's datetime is valid.
         Assumes the string is in ISO 8601:2004 format. '''
-    from utils import iso_to_dt64
+    from helpers import iso_to_dt64
     try:
         iso_to_dt64(iso_str=value)
         return True
@@ -89,7 +89,7 @@ def check_valid_date_time(value: str) -> bool:
 def check_email_addresses_valid(value: str) -> bool:
     ''' Checks whether each given entry is a "valid" email.
     See the function `is_valid_email` in `utils.py` for what is considered "valid". '''
-    from utils import is_valid_email
+    from helpers import is_valid_email
     for email in value.split(','):
         # Skip empty values
         if not email.strip():
