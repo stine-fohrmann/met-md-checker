@@ -86,7 +86,6 @@ class MDChecker():
             return True
         
         for attr_name, attr_config in requirements['attributes'].items():
-            print(attr_name)
             value = self.attrs.get(attr_name)
             self.checks_tracker[attr_name] = {}
             self.checks_tracker[attr_name]['checks'] = []
