@@ -1,3 +1,7 @@
+import os, json, re
+LICENSES_PATH = os.environ.get('METADATA_LICENSES_FILE', 'met-md-checker/data/licenses.json')
+GCMDSK_PATH   = os.environ.get('METADATA_LICENSES_FILE', 'met-md-checker/data/sciencekeywords.csv')
+
 CHECK_FUNCS = {}
 CROSSCHECK_FUNCS = {}
 
@@ -52,7 +56,7 @@ def check_is_between(value: str, args: dict) -> bool:
     try:
         val = float(value)
         return args['min'] <= val <= args['max']
-    except:
+    except ValueError, TypeError:
         return False
 
 @register_check('min_decimals')
@@ -61,13 +65,12 @@ def check_min_decs(value: str, args: dict) -> bool:
     try:
         num_decs = len(str(value).split('.')[1])
         return num_decs >= int(args['min_decs'])
-    except:
+    except ValueError, TypeError:
         return False
 
 @register_check('iso_8601_2004')
 def check_iso_8601_2004_time_format(value: str) -> bool:
     ''' Checks whether a string uses ISO 8601:2004 extended date format, i.e. YYYY-MM-DDTHH:MM:SSZ. '''
-    import re
     pattern = r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$'
     return bool(re.match(pattern, value))
 
@@ -126,16 +129,17 @@ def check_valid_gcmdsk(value: str) -> bool:
     ''' Checks whether each element prefixed by "GCMDSK:" in a 
         comma separated list is a valid GCMD science keyword. '''
     from gcmd_tools import make_gcmd_tree
-    sktree = make_gcmd_tree('met-md-checker/data/sciencekeywords.csv')
+    sktree = make_gcmd_tree(GCMDSK_PATH)
     # Separate keywords and prefixes
     kws = {}
     for pair in value.split(','):
         key, elements = pair.split(':', 1)
         key = key.strip()
-        
         element_list = [e.strip() for e in elements.split('>') if e.strip()]
         kws.setdefault(key, []).append(element_list)
-    for chain in kws['GCMDSK']:
+    if 'GCMDSK' not in kws:
+        return False
+    for chain in kws.get('GCMDSK'):
         if not sktree.contains(*chain):
             return False
     return True
@@ -143,7 +147,6 @@ def check_valid_gcmdsk(value: str) -> bool:
 @register_check('license_formatted_correctly')
 def check_license_formatted(value: str) -> bool:
     ''' Checks whether a string has format <URL> (<Identifier>). '''
-    import re
     pattern = r'^https?://(?:www\.)?[a-zA-Z0-9][a-zA-Z0-9.-]*\.[a-zA-Z]{2,}(?:/[^\s]*)? \(([^)]+)\)$'
     match = re.match(pattern, value.strip())
     return bool(match)
@@ -151,11 +154,8 @@ def check_license_formatted(value: str) -> bool:
 @register_check('spdx_license')
 def check_spdx_license(value: str) -> bool:
     ''' Checks whether a string is a SPDX license. '''
-    import json, re
-
     # Read licenses from file
-    with open('met-md-checker/data/licenses.json', 'r') as file:
-    # with open('data/licenses.json', 'r') as file:
+    with open(LICENSES_PATH, 'r') as file:
         lic_file = json.load(file)
 
     # Extract SPDX license IDs and URLS
@@ -166,6 +166,8 @@ def check_spdx_license(value: str) -> bool:
     # Extract given URL and ID
     pattern = r'^([^(]+)\s*\((.+?)\)$'
     match = re.match(pattern, value.strip())
+    if not match:
+        return False
     lic_ref = match.group(1).strip()
     lic_id  = match.group(2).strip()
 
@@ -192,7 +194,7 @@ def check_creator_types_valid(value: str) -> bool:
 '''--------- Cross-checks ---------'''
 
 @register_crosscheck('keywords_map_to_vocabulary')
-def check_keywords_map_to_vocab(values: []) -> bool:
+def check_keywords_map_to_vocab(values: [str]) -> bool:
     ''' Checks whether each prefix in 'keywords' is used in 'keywords_vocabulary' and vice versa. '''
 
     # Helper function for selecting unique prefixes
@@ -208,6 +210,6 @@ def check_keywords_map_to_vocab(values: []) -> bool:
     return collect_prefixes(values[0]) == collect_prefixes(values[1])
 
 @register_crosscheck('same_length')
-def check_same_length(values: [])-> bool:
+def check_same_length(values: [str])-> bool:
     ''' Checks whether the number of entries in the input attributes is consistent. '''
     return len(set([len(val.split(',')) for val in values])) == 1
