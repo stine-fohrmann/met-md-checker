@@ -60,16 +60,19 @@ class MDChecker():
             raise ConfigError('config must have "attributes" section')
         self.requirements = reqs
             
-    def checkRequirements(self):
+    def checkRequirements(self, attrs: dict = None):
         '''Checks attributes from input file against requirements defined in YAML'''
-        self.getAttrs()         # Get global attributes from input file
+        if attrs:
+            self.setAttrs(attrs=attrs)
+        else:
+            self.getAttrs()     # Get global attributes from input file
         self.loadRequirements() # Read requirements (checks) from YAML
         self.runChecks()        # Run checks
         self.printReport()      # Print results in terminal
 
     def runChecks(self, requirements: dict = None):
         '''Executes checks, adds errors and warnings to respective lists'''
-        from checks import CHECK_FUNCS
+        from checks import CHECK_FUNCS, CROSSCHECK_FUNCS
         from errors import MDError, MDWarning
 
         requirements = requirements if requirements else self.requirements
@@ -112,6 +115,34 @@ class MDChecker():
                             self.errors.append(MDError(attr=attr_name, message=check.get('message')))
                         case 'warning':
                             self.warnings.append(MDWarning(attr=attr_name, message=check.get('message')))
+
+        # Execute cross-checks
+        for check in requirements['cross_checks']:
+            check_type = check.get('type')
+            conditions = check.get('conditions')
+            self.checks_tracker['cc'] = []
+
+            # Execute cross check if conditions are met
+            if conditions:
+                if has_passed(conditions):
+                    attrs = check.get('involved_attributes')
+                    values = [self.attrs[a] for a in attrs]
+                    check_passed = CROSSCHECK_FUNCS[check_type](values)
+                else:
+                    continue
+            else:
+                check_passed = CROSSCHECK_FUNCS[check_type](values)
+            
+            check_track = check.copy()
+            check_track['passed'] = check_passed
+            self.checks_tracker['cc'].append(check_track)
+            
+            if not check_passed:
+                match check.get('severity'):
+                    case 'error':
+                        self.warnings.append(MDWarning(attr='cross-check', message=check.get('message')))
+                    case 'warning':
+                        self.errors.append(Error(attr='cross-check', message=check.get('message')))
 
 
 def main(args):
