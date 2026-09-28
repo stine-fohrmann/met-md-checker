@@ -1,4 +1,4 @@
-REQSPATH = 'met-md-checker/mdreqs.yaml'
+REQSPATH = 'met-md-checker/configs/mdreqs.yaml'
 INDENT = '     '
 REPORT_WIDTH = 60
 

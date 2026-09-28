@@ -9,7 +9,7 @@ See [https://adc.met.no/submit-data-as-netcdf-cf](https://adc.met.no/submit-data
 
 - checks the global attributes of a provided file against the METNO requirements (see [https://adc.met.no/submit-data-as-netcdf-cf](https://adc.met.no/submit-data-as-netcdf-cf)) and prints an overview report to the CLI
 - checks whether the required attributes are given and formatted correctly
-- requirements are defined in [mdreqs.yaml](mdreqs.yaml), including which checks should be performed for each mandatory attribute
+- requirements are defined in [configs/mdreqs.yaml](configs/mdreqs.yaml), including which checks should be performed for each mandatory attribute
 - currently, only the required attributes are checked, not the optional ones
 
 ## Usage
