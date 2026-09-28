@@ -1,3 +1,2 @@
 xarray
-selenium
 numpy
