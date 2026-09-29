@@ -88,13 +88,26 @@ def check_valid_date_time(value: str) -> bool:
 @register_check('email_addresses_valid')
 def check_email_addresses_valid(value: str) -> bool:
     ''' Checks whether each given entry is a "valid" email.
-    See the function `is_valid_email` in `utils.py` for what is considered "valid". '''
+    See the function `is_valid_email` in `helpers.py` for what is considered "valid". '''
     from helpers import is_valid_email
     for email in value.split(','):
         # Skip empty values
         if not email.strip():
             continue
         if not is_valid_email(email.strip()):
+            return False
+    return True
+
+@register_check('urls_valid')
+def urls_valid(value: str) -> bool:
+    ''' Checks whether each given entry is a valid URL.
+    See the function `is_valid_url` in `helpers.py` for what is considered "valid". '''
+    from helpers import is_valid_url
+    for url in value.split(','):
+        # Skip empty values
+        if not url.strip():
+            continue
+        if not is_valid_url(url.strip()):
             return False
     return True
 

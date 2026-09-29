@@ -558,6 +558,13 @@ attributes:
         message: is empty.
         conditions:
           - publisher_url/exists
+      - id: publisher_url/urls_valid
+        type: urls_valid
+        severity: warning
+        message: is not a valid URL.
+        conditions:
+          - publisher_url/exists
+          - publisher_url/nonempty
   
   publisher_institution:
     type: ACDD
