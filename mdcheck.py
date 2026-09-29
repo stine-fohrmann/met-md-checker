@@ -121,15 +121,16 @@ class MDChecker():
             conditions = check.get('conditions')
             self.checks_tracker['cc'] = []
             attrs = check.get('involved_attributes')
-            values = [self.attrs[a] for a in attrs]
 
             # Execute cross check if conditions are met
             if conditions:
                 if has_passed(conditions):
+                    values = [self.attrs[a] for a in attrs]
                     check_passed = CROSSCHECK_FUNCS[check_type](values)
                 else:
                     continue
             else:
+                values = [self.attrs[a] for a in attrs]
                 check_passed = CROSSCHECK_FUNCS[check_type](values)
             
             check_track = check.copy()
