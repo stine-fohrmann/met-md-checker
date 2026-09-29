@@ -1,2 +1,3 @@
 xarray
 numpy
+email_validator

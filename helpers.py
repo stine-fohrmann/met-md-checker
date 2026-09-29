@@ -1,11 +1,11 @@
 '''
 Smaller helper functions
 '''
+import numpy as np
+from email_validator import validate_email, EmailNotValidError
 
-
-def iso_to_dt64(iso_str: str) -> numpy.datetime64:
+def iso_to_dt64(iso_str: str) -> np.datetime64:
     ''' Converts valid ISO 8601:2004 string to datetime64. '''
-    import numpy as np
     ymd = iso_str.split('T')[0]
     hms = iso_str.split('T')[1][:-1]
     dt64 = np.datetime64('T'.join([ymd, hms]))
@@ -19,9 +19,11 @@ def is_valid_url(url: str) -> bool:
 
 def is_valid_email(email: str) -> bool:
     ''' Checks whether an email address is valid. '''
-    import re
-    reg = re.match("[^@]+@[^@]+\\.[^@]+", email)
-    return bool(reg)
+    try:
+        val_email = validate_email(email)
+        return True
+    except EmailNotValidError:
+        return False
 
-def split_list(value) -> list[str]:
+def split_list(value: str) -> list[str]:
     return [item.strip() for item in str(value).split(',') if item.strip()]
